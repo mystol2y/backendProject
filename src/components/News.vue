@@ -102,30 +102,32 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(news_, index) in news" :key="news + index">
-                    <td scope="row">{{ index + 1 }}</td>
-                    <td>{{ news_.title }}</td>
+                  <tr v-for="(news_, index) in pageOfItems" :key="news + index">
+                    <td scope="row">{{ news_.id + 1 }}</td>
+                    <td>{{ news_.news.title }}</td>
                     <td>
                       <img
-                        :src="api_img + news_.img_name"
+                        :src="api_img + news_.news.img_name"
                         alt=""
                         style="width: 100px"
                       />
                     </td>
-                    <td>{{ news_.publish == 1 ? "เปิดใช้งาน" : "ปิด" }}</td>
-                    <td>{{ news_.created_at | formatDate }}</td>
-                    <td>{{ news_.author }}</td>
+                    <td>
+                      {{ news_.news.publish == 1 ? "เปิดใช้งาน" : "ปิด" }}
+                    </td>
+                    <td>{{ news_.news.created_at | formatDate }}</td>
+                    <td>{{ news_.news.author }}</td>
                     <td>
                       <button
                         class="btn btn-primary"
-                        @click="deleteNews(news_.ref_id_img)"
+                        @click="deleteNews(news_.news.ref_id_img)"
                       >
                         <i class="fas fa-trash"></i>
                       </button>
                       <b-button
                         v-b-modal.modal-news-edit
                         variant="primary"
-                        @click="editNews(index)"
+                        @click="editNews(news_.id)"
                       >
                         <i class="fas fa-edit"></i>
                       </b-button>
@@ -205,15 +207,13 @@
                 </tbody>
               </table>
             </div>
-            <div class="card text-center m-3">
-              <div class="card-footer pb-0 pt-3">
-                <jw-pagination
-                  :pageSize="10"
-                  :labels="customLabels"
-                  :items="news ? news : undefined"
-                  @changePage="onChangePage"
-                ></jw-pagination>
-              </div>
+            <div class="text-center m-3 pb-0 pt-3">
+              <jw-pagination
+                :pageSize="10"
+                :labels="customLabels"
+                :items="exampleItems ? exampleItems : undefined"
+                @changePage="onChangePage"
+              ></jw-pagination>
             </div>
           </div>
         </section>
@@ -261,6 +261,7 @@ export default {
       pageOfItems: [],
       customLabels,
       api_img,
+      exampleItems: "",
     };
   },
   methods: {
@@ -293,6 +294,17 @@ export default {
             text: "สร้างข่าวสำเร็จ",
           });
           this.getNews();
+          this.objforms = {
+            title: "",
+            body: "",
+            author: "",
+            description: "",
+            img: {
+              file: "",
+              name: "",
+            },
+            publish: "1",
+          };
           console.log(response.data);
         })
         .catch(function(error) {
@@ -308,6 +320,10 @@ export default {
       await axios(config)
         .then((response) => {
           this.news = response.data;
+          this.exampleItems = [...this.news.keys()].map((i) => ({
+            id: i,
+            news: this.news[i],
+          }));
           // alert('get');
           //   this.$store.dispatch("addNews", response.data);
         })

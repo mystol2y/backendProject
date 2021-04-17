@@ -4,10 +4,10 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 const routes = [{
-        path: '/Dashboard',
-        name: 'Dashboard',
+        path: '/Home',
+        name: 'Home',
         component: () =>
-            import ('../views/Dashboard.vue')
+            import ('../views/Home.vue')
     },
     {
         path: '/',

@@ -92,10 +92,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(admin, index) in pageOfItems" :key="admin">
-                    <td scope="row">{{ index + 1 }}</td>
-                    <td>{{ admin.username }}</td>
-                    <td>{{ admin.created_date | formatDate }}</td>
+                  <tr v-for="admin in pageOfItems" :key="admin">
+                    <td scope="row">{{ admin.id + 1 }}</td>
+                    <td>{{ admin.admin.username }}</td>
+                    <td>{{ admin.admin.created_date | formatDate }}</td>
                     <td>
                       <button
                         class="btn btn-primary "
@@ -106,7 +106,7 @@
                       <b-button
                         v-b-modal.modal-banner-edit
                         variant="primary"
-                        @click="editadmin(index)"
+                        @click="editadmin(admin.id)"
                       >
                         <i class="fas fa-edit"></i>
                       </b-button>
@@ -180,15 +180,13 @@
                 </tbody>
               </table>
             </div>
-            <div class="card text-center m-3">
-              <div class="card-footer pb-0 pt-3">
-                <jw-pagination
-                  :pageSize="10"
-                  :labels="customLabels"
-                  :items="admin ? admin : undefined"
-                  @changePage="onChangePage"
-                ></jw-pagination>
-              </div>
+            <div class="text-center m-3 pb-0 pt-3">
+              <jw-pagination
+                :pageSize="10"
+                :labels="customLabels"
+                :items="exampleItems ? exampleItems : undefined"
+                @changePage="onChangePage"
+              ></jw-pagination>
             </div>
           </div>
         </section>
@@ -229,6 +227,7 @@ export default {
       classvalidateedit: {
         borderColor: "",
       },
+      exampleItems: "",
     };
   },
   methods: {
@@ -252,6 +251,11 @@ export default {
             });
             this.cleareditadmin();
             this.getadmin();
+            this.objforms = {
+              username: "",
+              password: "",
+              repassword: "",
+            };
             console.log(response.data);
           })
           .catch(function(error) {
@@ -268,6 +272,10 @@ export default {
       await axios(config)
         .then((response) => {
           this.admin = response.data;
+          this.exampleItems = [...this.admin.keys()].map((i) => ({
+            id: i,
+            admin: this.admin[i],
+          }));
           // alert('get');
           //   this.$store.dispatch("addadmin", response.data);
         })

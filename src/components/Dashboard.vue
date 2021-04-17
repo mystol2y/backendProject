@@ -1,136 +1,5 @@
 <template>
   <div class="Dashboard" id="Dashboard">
-    <div id="sidebar" class="active">
-      <div class="sidebar-wrapper active">
-        <div class="sidebar-header">
-          <div class="d-flex justify-content-between">
-            <div class="logo mx-auto d-block">
-              <img
-                src="../../src/assets/registerlogo.png"
-                alt="Logo"
-                srcset=""
-              />
-            </div>
-            <div class="toggler">
-              <a href="#" class="sidebar-hide d-xl-none d-block"
-                ><i class="bi bi-x bi-middle"></i
-              ></a>
-            </div>
-          </div>
-          <button class="btn btn-danger w-100 mt-5" @click="logOut">
-            ออกจากระบบ
-          </button>
-        </div>
-        <div class="sidebar-menu">
-          <ul class="menu">
-            <li class="sidebar-title">Menu</li>
-
-            <li
-              class="sidebar-item "
-              @click="(status = 'all'), setActive('lia')"
-              :class="{ active: isActive('lia') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-
-            <li
-              class="sidebar-item "
-              @click="(status = 'a'), setActive('li')"
-              :class="{ active: isActive('li') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>สมาชิก</span>
-              </a>
-            </li>
-            <li
-              class="sidebar-item   "
-              @click="(status = 'b'), setActive('li1')"
-              :class="{ active: isActive('li1') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>ข่าวสาร</span>
-              </a>
-            </li>
-            <li
-              class="sidebar-item "
-              @click="(status = 'c'), setActive('li2')"
-              :class="{ active: isActive('li2') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>กิจกรรม</span>
-              </a>
-            </li>
-            <li
-              class="sidebar-item "
-              @click="(status = 'd'), setActive('li3')"
-              :class="{ active: isActive('li3') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>สิทธิประโยชน์</span>
-              </a>
-            </li>
-
-            <li
-              class="sidebar-item "
-              @click="(status = 'e'), setActive('li4')"
-              :class="{ active: isActive('li4') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>Banner</span>
-              </a>
-            </li>
-
-            <li
-              class="sidebar-item "
-              @click="(status = 'f'), setActive('li5')"
-              :class="{ active: isActive('li5') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>Admin</span>
-              </a>
-            </li>
-            <li
-              class="sidebar-item "
-              @click="(status = 'g'), setActive('li6')"
-              :class="{ active: isActive('li6') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>Receipt</span>
-              </a>
-            </li>
-            <li
-              class="sidebar-item "
-              @click="(status = 'h'), setActive('li7')"
-              :class="{ active: isActive('li7') }"
-            >
-              <a class="sidebar-link">
-                <i class="bi bi-grid-fill"></i>
-                <span>Invoice</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-        <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
-      </div>
-    </div>
-
-    <div id="main" v-if="status === 'all'">
-      <header class="mb-3">
-        <a href="#" class="burger-btn d-block d-xl-none">
-          <i class="bi bi-justify fs-3"></i>
-        </a>
-      </header>
-
       <div class="page-heading">
         <h3>Dashboard</h3>
       </div>
@@ -185,7 +54,9 @@
                         <h6 class="text-muted font-semibold">
                           จำนวนสิทธิพิเศษ
                         </h6>
-                        <h6 class="font-extrabold mb-0">80</h6>
+                        <h6 class="font-extrabold mb-0">
+                          {{ benefits_count }}
+                        </h6>
                       </div>
                     </div>
                   </div>
@@ -249,17 +120,15 @@
                       </div>
                     </div>
                   </div>
-                  <div class="card text-center m-3">
-                    <div class="card-footer pb-0 pt-3">
-                      <jw-pagination
-                        :pageSize="5"
-                        :labels="customLabels"
-                        :items="
-                          member_expire_soon ? member_expire_soon : undefined
-                        "
-                        @changePage="onChangePageMES"
-                      ></jw-pagination>
-                    </div>
+                  <div class="text-center m-3 pb-0 pt-3">
+                    <jw-pagination
+                      :pageSize="5"
+                      :labels="customLabels"
+                      :items="
+                        member_expire_soon ? member_expire_soon : undefined
+                      "
+                      @changePage="onChangePageMES"
+                    ></jw-pagination>
                   </div>
                 </div>
               </div>
@@ -297,15 +166,13 @@
                       </table>
                     </div>
                   </div>
-                  <div class="card text-center m-3">
-                    <div class="card-footer pb-0 pt-3">
-                      <jw-pagination
-                        :pageSize="5"
-                        :labels="customLabels"
-                        :items="news ? news : undefined"
-                        @changePage="onChangePageNews"
-                      ></jw-pagination>
-                    </div>
+                  <div class="text-center m-3 pb-0 pt-3">
+                    <jw-pagination
+                      :pageSize="5"
+                      :labels="customLabels"
+                      :items="news ? news : undefined"
+                      @changePage="onChangePageNews"
+                    ></jw-pagination>
                   </div>
                 </div>
               </div>
@@ -341,15 +208,13 @@
                       </table>
                     </div>
                   </div>
-                  <div class="card text-center m-3">
-                    <div class="card-footer pb-0 pt-3">
-                      <jw-pagination
-                        :pageSize="5"
-                        :labels="customLabels"
-                        :items="events ? events : undefined"
-                        @changePage="onChangePageEvents"
-                      ></jw-pagination>
-                    </div>
+                  <div class="text-center m-3 pb-0 pt-3">
+                    <jw-pagination
+                      :pageSize="5"
+                      :labels="customLabels"
+                      :items="events ? events : undefined"
+                      @changePage="onChangePageEvents"
+                    ></jw-pagination>
                   </div>
                 </div>
               </div>
@@ -426,49 +291,11 @@
         </section>
       </div>
     </div>
-
-    <div id="main" v-if="status === 'a'">
-      <Member />
-    </div>
-
-    <div id="main" v-if="status === 'b'">
-      <News />
-    </div>
-
-    <div id="main" v-if="status === 'c'">
-      <Activity />
-    </div>
-
-    <div id="main" v-if="status === 'd'">
-      <Benefits />
-    </div>
-
-    <div id="main" v-if="status === 'e'">
-      <Banner />
-    </div>
-
-    <div id="main" v-if="status === 'f'">
-      <Admin />
-    </div>
-    <div id="main" v-if="status === 'g'">
-      <Receipt />
-    </div>
-    <div id="main" v-if="status === 'h'">
-      <Invoice />
-    </div>
-  </div>
 </template>
 //require('@/assets/js/main.js');
 
 <script>
-import Receipt from "@/components/Receipt.vue";
-import Invoice from "@/components/Invoice.vue";
-import Member from "@/components/Member.vue";
-import News from "@/components/News.vue";
-import Activity from "@/components/Activity.vue";
-import Benefits from "@/components/Benefits.vue";
-import Banner from "@/components/Banner.vue";
-import Admin from "@/components/Admin.vue";
+
 let axios = require("axios");
 const customLabels = {
   first: "fisrt",
@@ -476,18 +303,12 @@ const customLabels = {
   previous: "<",
   next: ">",
 };
+// import Member from "@/components/Member.vue";
 import router from "../router/index";
 export default {
   name: "Dashboard",
   components: {
-    Member,
-    News,
-    Activity,
-    Benefits,
-    Banner,
-    Admin,
-    Receipt,
-    Invoice,
+    //   Member,
   },
   data() {
     return {
@@ -527,15 +348,24 @@ export default {
       members: "",
       members_count: "",
       members_fee: "",
+      benefits_count: "",
       admin: "",
       member_expire_soon: "",
       pageOfItemsMES: [],
     };
   },
-  mounted() {
+  async mounted() {
     let addScript = document.createElement("script");
     addScript.setAttribute("src", "/assets/js/main.js");
     document.head.appendChild(addScript);
+    await this.getAdmin();
+    await this.getEvents();
+    await this.getBenefits();
+    await this.getNews();
+    await this.getRegistoday();
+    await this.getMembers();
+    await this.getMembersfee();
+    await this.getMember_sexpiresoon();
   },
   methods: {
     isActive: function(menuItem) {
@@ -640,6 +470,22 @@ export default {
           console.log(error);
         });
     },
+    async getBenefits() {
+      let config = {
+        method: "get",
+        url: "https://express.crm-flow.com/api/benefits/read",
+        headers: {},
+      };
+      await axios(config)
+        .then((response) => {
+          this.benefits_count = response.data.length;
+          // alert('get');
+          //   this.$store.dispatch("addNews", response.data);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
     async getMember_sexpiresoon() {
       var config = {
         method: "get",
@@ -685,6 +531,7 @@ export default {
   async created() {
     await this.getAdmin();
     await this.getEvents();
+    await this.getBenefits();
     await this.getNews();
     await this.getRegistoday();
     await this.getMembers();

@@ -88,28 +88,28 @@
                 </thead>
                 <tbody>
                   <tr v-for="(bann, index) in pageOfItems" :key="bann + index">
-                    <td scope="row">{{ index + 1 }}</td>
+                    <td scope="row">{{ bann.id + 1 }}</td>
                     <td class="wi-img">
                       <img
-                        :src="api_img + bann.img_name"
+                        :src="api_img + bann.banner.img_name"
                         alt=""
                         style="width: 100px"
                       />
                     </td>
-                    <td>{{ getTypebanner(bann.type) }}</td>
-                    <td>{{ bann.created_date | formatDate }}</td>
-                    <td>{{ bann.author }}</td>
+                    <td>{{ getTypebanner(bann.banner.type) }}</td>
+                    <td>{{ bann.banner.created_date | formatDate }}</td>
+                    <td>{{ bann.banner.author }}</td>
                     <td>
                       <button
                         class="btn btn-primary "
-                        @click="deleteBanner(bann.ref_id)"
+                        @click="deleteBanner(bann.banner.ref_id)"
                       >
                         <i class="fas fa-trash"></i>
                       </button>
                       <b-button
                         v-b-modal.modal-banner-edit
                         variant="primary"
-                        @click="editBanner(index)"
+                        @click="editBanner(bann.id)"
                       >
                         <i class="fas fa-edit"></i>
                       </b-button>
@@ -182,15 +182,13 @@
                 </b-modal>
               </table>
             </div>
-            <div class="card text-center m-3">
-              <div class="card-footer pb-0 pt-3">
-                <jw-pagination
-                  :pageSize="10"
-                  :labels="customLabels"
-                  :items="banner ? banner : undefined"
-                  @changePage="onChangePage"
-                ></jw-pagination>
-              </div>
+            <div class="text-center m-3 pb-0 pt-3">
+              <jw-pagination
+                :pageSize="10"
+                :labels="customLabels"
+                :items="exampleItems ? exampleItems : undefined"
+                @changePage="onChangePage"
+              ></jw-pagination>
             </div>
           </div>
         </section>
@@ -229,6 +227,7 @@ export default {
       },
       pageOfItems: [],
       customLabels,
+      exampleItems:"",
     };
   },
   methods: {
@@ -276,6 +275,10 @@ export default {
           this.banner = response.data;
           this.banner_img = "";
           console.log(response.data);
+          this.exampleItems = [...this.banner.keys()].map((i) => ({
+            id: i,
+            banner: this.banner[i],
+          }));
         })
         .catch(function(error) {
           console.log(error);

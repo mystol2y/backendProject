@@ -111,34 +111,33 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(event, index) in pageOfItems"
-                    :key="event + index"
-                  >
-                    <td scope="row">{{ index + 1 }}</td>
-                    <td>{{ event.title }}</td>
+                  <tr v-for="event in pageOfItems" :key="event.events.id">
+                    <td scope="row">{{ event.id + 1 }}</td>
+                    <td>{{ event.events.title }}</td>
                     <td>
                       <img
-                        :src="api_img + event.img_name"
+                        :src="api_img + event.events.img_name"
                         alt=""
                         style="width: 100px"
                       />
                     </td>
-                    <td>{{ event.publish == 1 ? "เปิดใช้งาน" : "ปิด" }}</td>
-                    <td>{{ event.created_at | formatDate }}</td>
-                    <td>{{ event.event_time | formatDate }}</td>
-                    <td>{{ event.author }}</td>
+                    <td>
+                      {{ event.events.publish == 1 ? "เปิดใช้งาน" : "ปิด" }}
+                    </td>
+                    <td>{{ event.events.created_at | formatDate }}</td>
+                    <td>{{ event.events.event_time | formatDate }}</td>
+                    <td>{{ event.events.author }}</td>
                     <td>
                       <button
                         class="btn btn-primary"
-                        @click="deleteEvents(event.ref_id_img)"
+                        @click="deleteEvents(event.events.ref_id_img)"
                       >
                         <i class="fas fa-trash"></i>
                       </button>
                       <b-button
                         v-b-modal.modal-events-edit
                         variant="primary"
-                        @click="editEvents(index)"
+                        @click="editEvents(event.id)"
                       >
                         <i class="fas fa-edit"></i>
                       </b-button>
@@ -221,15 +220,13 @@
                 </tbody>
               </table>
             </div>
-            <div class="card text-center m-3">
-              <div class="card-footer pb-0 pt-3">
-                <jw-pagination
-                  :pageSize="10"
-                  :labels="customLabels"
-                  :items="events ? events : undefined"
-                  @changePage="onChangePage"
-                ></jw-pagination>
-              </div>
+            <div class="text-center m-3 pb-0 pt-3">
+              <jw-pagination
+                :pageSize="10"
+                :labels="customLabels"
+                :items="exampleItems ? exampleItems : undefined"
+                @changePage="onChangePage"
+              ></jw-pagination>
             </div>
           </div>
         </section>
@@ -281,6 +278,7 @@ export default {
       pageOfItems: [],
       customLabels,
       api_img,
+      exampleItems: "",
     };
   },
   methods: {
@@ -313,6 +311,18 @@ export default {
             text: "สร้างกิจกรรมสำเร็จ",
           });
           this.getEvents();
+          this.objforms = {
+            title: "",
+            body: "",
+            event_time: "",
+            author: "",
+            description: "",
+            img: {
+              file: "",
+              name: "",
+            },
+            publish: "1",
+          };
           console.log(response.data);
         })
         .catch(function(error) {
@@ -328,6 +338,10 @@ export default {
       await axios(config)
         .then((response) => {
           this.events = response.data;
+          this.exampleItems = [...this.events.keys()].map((i) => ({
+            id: i,
+            events: this.events[i],
+          }));
           // alert('get');
           //   this.$store.dispatch("addevents", response.data);
         })

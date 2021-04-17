@@ -65,7 +65,7 @@ export default {
           this.admin = await response.data[0];
           localStorage.setItem("admin", JSON.stringify(this.admin));
           this.$store.dispatch("addAdmin", JSON.stringify(this.admin));
-          router.push({ name: "Dashboard" });
+          router.push({ name: "Home" });
         })
         .catch(function(error) {
           console.log(error);

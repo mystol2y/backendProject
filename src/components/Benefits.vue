@@ -8,7 +8,7 @@
       </header>
       <notifications position="top right" />
       <div class="page-heading">
-        <h3>ข่าวสาร</h3>
+        <h3>สิทธิประโยชน์</h3>
       </div>
       <div class="page-content">
         <section class="row">
@@ -102,33 +102,32 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(benefit, index) in pageOfItems"
-                    :key="benefit + index"
-                  >
-                    <td scope="row">{{ index + 1 }}</td>
-                    <td>{{ benefit.title }}</td>
+                  <tr v-for="benefit in pageOfItems" :key="benefit.id">
+                    <td scope="row">{{ benefit.id + 1 }}</td>
+                    <td>{{ benefit.benefits.title }}</td>
                     <td>
                       <img
-                        :src="api_img + benefit.img_name"
+                        :src="api_img + benefit.benefits.img_name"
                         alt=""
                         style="width: 100px"
                       />
                     </td>
-                    <td>{{ benefit.publish == 1 ? "เปิดใช้งาน" : "ปิด" }}</td>
-                    <td>{{ benefit.created_at }}</td>
-                    <td>{{ benefit.author }}</td>
+                    <td>
+                      {{ benefit.benefits.publish == 1 ? "เปิดใช้งาน" : "ปิด" }}
+                    </td>
+                    <td>{{ benefit.benefits.created_at | formatDate }}</td>
+                    <td>{{ benefit.benefits.author }}</td>
                     <td>
                       <button
                         class="btn btn-primary"
-                        @click="deleteBenefits(benefit.ref_id_img)"
+                        @click="deleteBenefits(benefit.benefits.ref_id_img)"
                       >
                         <i class="fas fa-trash"></i>
                       </button>
                       <b-button
                         v-b-modal.modal-benefits-edit
                         variant="primary"
-                        @click="editBenefits(index)"
+                        @click="editBenefits(benefit.id)"
                       >
                         <i class="fas fa-edit"></i>
                       </b-button>
@@ -208,15 +207,13 @@
                 </tbody>
               </table>
             </div>
-            <div class="card text-center m-3">
-              <div class="card-footer pb-0 pt-3">
-                <jw-pagination
-                  :pageSize="10"
-                  :labels="customLabels"
-                  :items="benefits ? benefits : undefined"
-                  @changePage="onChangePage"
-                ></jw-pagination>
-              </div>
+            <div class="text-center m-3 pb-0 pt-3">
+              <jw-pagination
+                :pageSize="10"
+                :labels="customLabels"
+                :items="exampleItems ? exampleItems : undefined"
+                @changePage="onChangePage"
+              ></jw-pagination>
             </div>
           </div>
         </section>
@@ -264,6 +261,7 @@ export default {
       pageOfItems: [],
       customLabels,
       api_img,
+      exampleItems: "",
     };
   },
   methods: {
@@ -297,6 +295,17 @@ export default {
           });
           console.log(response.data);
           this.getBenefits();
+          this.objforms = {
+            title: "",
+            body: "",
+            author: "",
+            description: "",
+            img: {
+              file: "",
+              name: "",
+            },
+            publish: "1",
+          };
         })
         .catch(function(error) {
           console.log(error);
@@ -311,6 +320,10 @@ export default {
       await axios(config)
         .then((response) => {
           this.benefits = response.data;
+          this.exampleItems = [...this.benefits.keys()].map((i) => ({
+            id: i,
+            benefits: this.benefits[i],
+          }));
           // alert('get');
           //   this.$store.dispatch("addNews", response.data);
         })

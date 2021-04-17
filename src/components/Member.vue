@@ -142,13 +142,18 @@
                               </div>
                               <div class="col-xl-6 col-md-12 col-sm-12">
                                 วันเกิด<br />
-                                <date-picker
+                                <VueCtkDateTimePicker
+                                  format="YYYY-MM-DD"
+                                  formatted="L"
                                   v-model="arr.b_date"
-                                  lang="en"
                                   type="day"
-                                  format="DD-MM-YYYY"
                                   class="w-100"
-                                ></date-picker>
+                                  :no-label="true"
+                                  :only-date="true"
+                                  :no-header="true"
+                                  :no-button-now="true"
+                                  locale="th"
+                                />
                               </div>
                               <div class="col-xl-6 col-md-12 col-sm-12">
                                 ชื่อ (สามี/ภรรยา)
@@ -590,22 +595,23 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(member, index) in pageOfItems"
-                    :key="member + index"
-                  >
-                    <td scope="row">{{ index + 1 }}</td>
-                    <td>{{ member.firstname }} {{ member.lastname }}</td>
-                    <td>{{ member.created_date | formatDate }}</td>
+                  <tr v-for="member in pageOfItems" :key="member.id">
+                    <td scope="row">{{ member.id + 1 }}</td>
+                    <td>
+                      {{ member.member.firstname }} {{ member.member.lastname }}
+                    </td>
+                    <td>{{ member.member.created_date | formatDate }}</td>
                     <td>
                       {{
-                        member.status == 0 ? "ยังไม่ชำระเงิน" : "ชำระเงินแล้ว"
+                        member.member.status == 0
+                          ? "ยังไม่ชำระเงิน"
+                          : "ชำระเงินแล้ว"
                       }}
                     </td>
                     <td>
                       <button
                         class="btn btn-primary"
-                        @click="deleteMember(member.member_id)"
+                        @click="deleteMember(member.member.member_id)"
                       >
                         <i class="fas fa-trash"></i>
                       </button>
@@ -613,7 +619,9 @@
                         b-button
                         v-b-modal.modal-edit
                         variant="primary"
-                        @click="getMembers_profile(index, member.member_id)"
+                        @click="
+                          getMembers_profile(member.id, member.member.member_id)
+                        "
                       >
                         <i class="fas fa-edit"></i>
                       </b-button>
@@ -621,7 +629,7 @@
                         b-button
                         v-b-modal.modal-image
                         variant="primary"
-                        @click="getMembers_image(member.member_id)"
+                        @click="getMembers_image(member.member.member_id)"
                       >
                         <i class="fas fa-tasks"></i>
                       </b-button>
@@ -630,15 +638,13 @@
                 </tbody>
               </table>
             </div>
-            <div class="card text-center m-3">
-              <div class="card-footer pb-0 pt-3">
-                <jw-pagination
-                  :pageSize="10"
-                  :labels="customLabels"
-                  :items="members ? members : undefined"
-                  @changePage="onChangePage"
-                ></jw-pagination>
-              </div>
+            <div class="text-center m-3 pb-0 pt-3">
+              <jw-pagination
+                :pageSize="10"
+                :labels="customLabels"
+                :items="exampleItems ? exampleItems : undefined"
+                @changePage="onChangePage"
+              ></jw-pagination>
             </div>
           </div>
           <!-- Button trigger modal -->
@@ -736,13 +742,17 @@
                 </div>
                 <div class="col-xl-6 col-md-12 col-sm-12">
                   วันเกิด<br />
-                  <date-picker
+                  <VueCtkDateTimePicker
+                    format="YYYY-MM-DD"
+                    formatted="L"
                     v-model="member.b_date"
-                    lang="en"
-                    type="day"
-                    format="DD-MM-YYYY"
                     class="w-100"
-                  ></date-picker>
+                    :no-label="true"
+                    :only-date="true"
+                    :no-header="true"
+                    :no-button-now="true"
+                    locale="th"
+                  />
                 </div>
                 <div class="col-xl-6 col-md-12 col-sm-12">
                   ชื่อ (สามี/ภรรยา)
@@ -1326,8 +1336,6 @@ const customLabels = {
 };
 const api_img = "https://express.crm-flow.com/";
 let axios = require("axios");
-import DatePicker from "vue2-datepicker";
-import "vue2-datepicker/index.css";
 export default {
   name: "Member",
   data() {
@@ -1427,11 +1435,13 @@ export default {
         slip_img: "",
       },
       profile_img: [],
+      exampleItems: "",
     };
   },
   async created() {
     await this.initial();
     await this.getMembers();
+    await this.gg();
   },
   computed: {
     get() {
@@ -1460,6 +1470,10 @@ export default {
               value[1].managing_partner
             );
           }
+          this.exampleItems = [...this.members.keys()].map((i) => ({
+            id: i,
+            member: this.members[i],
+          }));
         })
         .catch(function(error) {
           console.log(error);
@@ -1516,6 +1530,12 @@ export default {
       };
       await axios(config)
         .then(async (response) => {
+          this.$notify({
+            type: "success",
+            title: "ทำการายการสำเร็จ",
+            text: "ตรวจสอบสมาชิกสำเร็จ",
+          });
+          this.getMembers();
           // this.image_name = response.data;
           // console.log(response.data);
           this.imgmodal = false;
@@ -1592,6 +1612,40 @@ export default {
               title: "ทำการายการสำเร็จ",
               text: "สมัครสมาชิกสำเร็จ",
             });
+            this.getMembers();
+            this.arr = {
+              username: "",
+              password: "",
+              repassword: "",
+              b_date: "",
+              gender: "",
+              firstname: "",
+              lastname: "",
+              age: "",
+              married: "",
+              address: {
+                h_num: "",
+                road: "",
+                locality: "",
+                district: "",
+                province: "",
+                zip_code: "",
+              },
+              commercial_affairs: "",
+              member_type: "",
+              commercial_address: "",
+              phone: "",
+              mobile: "",
+              managing_partner: {
+                gender: "",
+                fullname: "",
+              },
+              house_particulars_img: "",
+              id_card_img: "",
+              commercial_particulars_img: "",
+              profile_img: "",
+              slip_img: "",
+            };
             // console.log(localStorage.getItem("username"));
             console.log(response.data);
           })
@@ -1657,7 +1711,7 @@ export default {
       ) {
         var config = {
           method: "post",
-          url: "https://express.crm-flow.com/api/registerforms/update",
+          url: "/api/registerforms/update",
           data: data,
         };
         await axios(config)
@@ -1667,6 +1721,7 @@ export default {
               title: "ทำการายการสำเร็จ",
               text: "แก้ไขข้อมูลสมาชิกสำเร็จ",
             });
+            this.getMembers();
             // console.log(localStorage.getItem("username"));
             console.log(response.data);
           })
@@ -1736,9 +1791,7 @@ export default {
       };
     },
   },
-  components: {
-    DatePicker,
-  },
+  components: {},
 };
 </script>
 
